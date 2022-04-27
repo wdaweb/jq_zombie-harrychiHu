@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHOOTING</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: url('./mori.png') no-repeat center center/ cover;
+      animation: bg-body 5s infinite;
+      cursor: url(./cursor.png) 50 50, auto;
+    }
+
+
+    @keyframes bg-body {
+      0% {
+        backdrop-filter: blur(0px);
+      }
+
+      50% {
+        backdrop-filter: blur(5px);
+      }
+
+      100% {
+        backdrop-filter: blur(0px);
+      }
+
+    }
+
+    p,
+    div {
+      user-select: none;
+    }
+
+    #game {
+      width: 1800px;
+      height: 1080px;
+      background: url('./mori.png') no-repeat center center/ cover;
+      overflow: hidden;
+      position: relative;
+      cursor: url(./cursor.png) 50 50, auto;
+      mix-blend-mode: hard-light;
+      z-index: 2;
+      margin: auto;
+      filter: blur();
+    }
+
+    #game img {
+      height: 300px;
+      position: absolute;
+      /* 無法被選取 */
+      user-select: none;
+      /* 無法拖曳 */
+      -webkit-user-drag: none;
+      -webkit-user-select: none;
+    }
+
+    .blood {
+      /* 忽略點擊事件 */
+      pointer-events: none;
+    }
+
+    .blood-g {
+      /* 忽略點擊事件 */
+      pointer-events: none;
+    }
+
+    #bg {
+      position: relative;
+      width: 1800px;
+      height: 1080px;
+      background-color: lightseagreen;
+      overflow: hidden;
+      margin: auto;
+    }
+
+    #bg-video {
+      position: absolute;
+      bottom: -50px;
+      width: 200%;
+      height: 200%;
+      opacity: 0.7;
+      z-index: 1;
+    }
+
+    #bg-title {
+      filter: url('#filter');
+    }
+
+    #title {
+      font-size: 10rem;
+      text-shadow: 0 0 0 whitesmoke;
+      animation: smoky 10s infinite;
+      background-clip: text;
+      filter: blur(1px);
+      font-family: 'Creepster', cursive;
+      letter-spacing: 30px;
+      color: red;
+      text-align: center;
+    }
+
+    @keyframes smoky {
+      to {
+        text-shadow: 0 0 20px whitesmoke;
+        opacity: 0;
+      }
+    }
+
+    #btn-start {
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: #ebebeb;
+      text-transform: uppercase;
+      color: #a2a2a2;
+      font-family: 'Creepster', cursive;
+      letter-spacing: 10px;
+      font-size: 8rem;
+      animation: start 2s infinite;
+      box-shadow: 0 0 0 0 rgba(23, 128, 122, 0.3);
+      cursor: url(./cursor_black.png) 50 50, auto;
+      position: absolute;
+      left: 19%;
+      top: 17%;
+      z-index: 3;
+      border: none;
+    }
+
+    @keyframes start {
+
+      0% {
+        transform: scale(0.9);
+
+
+      }
+
+      80% {
+        transform: scale(1);
+
+        box-shadow: 0 0 0 30px rgba(23, 128, 122, 0.5);
+      }
+
+      100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 30px rgba(23, 128, 122, 0);
+      }
+
+
+    }
+
+    #btn-start:hover {
+      animation: none;
+    }
+
+    #btn-start:focus {
+      background: red;
+      color: #000;
+    }
+
+    #p-score {
+      font-family: 'Creepster', cursive;
+      position: absolute;
+      left: 5%;
+      top: 15%;
+      color: #fff;
+      font-size: 50px;
+      z-index: 4;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+    }
+
+    #p-time {
+      font-family: 'Creepster', cursive;
+      position: absolute;
+      right: 5%;
+      top: 15%;
+      color: #fff;
+      font-size: 50px;
+      z-index: 4;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+    }
+
+    .red-num {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <input type="button" value="start" id="btn-start">
+
+  <p id="p-score">score: <span id="text-score">0</span></p>
+  <p id="p-time">time: <span id="text-time">0</span></p>
+
+  <div id="bg-title">
+    <div id="title">SHOOTING</div>
+  </div>
+  <div id="bg">
+    <div id="game"></div>
+    <video src="./random floor fog effects 03.mp4" id="bg-video" autoplay="autoplay" muted="true" loop="true"></video>
+  </div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+    integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=='
+    crossorigin='anonymous'></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    let score = 0
+    let countdown = 5
+    let timer = 0
+
+    function move(zombie) {
+      const top = Math.round(Math.random() * 70) + '%'
+      const left = Math.round(Math.random() * 70) + '%'
+      zombie.stop().animate({ top, left }, 2000, function () {
+        move(zombie)
+      })
+    }
+    function move(plate) {
+      const top = Math.round(Math.random() * 70) + '%'
+      const left = Math.round(Math.random() * 70) + '%'
+      plate.stop().animate({ top, left }, 2000, function () {
+        move(plate)
+      })
+    }
+
+    $('#btn-start').click(function () {
+      // 停用按鈕s
+      $(this).hide()
+      // $(this).attr('disabled', true)
+      // 重設
+      score = 0
+      $('#text-score').text(score)
+      countdown = 10
+      $('#text-time').text(countdown)
+      $('#text-score').removeClass('red-num')
+      $('#text-time').removeClass('red-num')
+
+      // 開始遊戲
+      timer = setInterval(function () {
+        // 倒數
+        countdown--
+
+        $('#text-time').text(countdown)
+
+
+        const random = Math.round(Math.random() * 9)
+        if (random > 3 && $('#game .zombie').length < 5) {
+          const top = Math.round(Math.random() * 70) + '%'
+          const left = Math.round(Math.random() * 70) + '%'
+          const zombie = $(`<img src="./3.gif" class="zombie" style="top: ${top}; left: ${left}">`)
+          $('#game').append(zombie)
+          move(zombie)
+        }
+        const random1 = Math.round(Math.random() * 9)
+        if (random1 > 4 && $('#game .plate').length < 5) {
+          const top = Math.round(Math.random() * 70) + '%'
+          const left = Math.round(Math.random() * 70) + '%'
+          const plate = $(`<img src="./4.gif" class="plate" style="top: ${top}; left: ${left}">`)
+          $('#game').append(plate)
+          move(plate)
+        }
+
+        if (countdown <= 0) {
+          clearInterval(timer)
+          // 清空遊戲區域
+          $('#game img').remove()
+          // 重新啟用開始按鈕
+          $('#btn-start').show()
+          // $('#btn-start').attr('disabled', false)
+          Swal.fire({
+            title: '遊戲結束',
+            text: `時間到，你得到 ${score} 分`,
+            icon: 'info'
+          })
+        }
+        if (score < 0) {
+          clearInterval(timer)
+          // 清空遊戲區域
+          $('#game img').remove()
+          // 重新啟用開始按鈕
+          $('#btn-start').show()
+          // $('#btn-start').attr('disabled', false)
+          Swal.fire({
+            title: '遊戲結束',
+            text: '你輸了，被僵屍殺死了',
+            icon: 'info'
+          })
+        }
+        if (score >= 30) {
+          $('#text-score').addClass('red-num')
+        }
+        if (countdown <= 5) {
+          $('#text-time').addClass('red-num')
+        }
+      }, 1000)
+    })
+
+    $('#game').on('click', '.zombie', function () {
+      $(this).attr('src', './blood-g.png')
+      $(this).removeClass('zombie').addClass('blood-g')
+      $(this).stop()
+      score += 10
+      $('#text-score').text(score)
+    })
+    $('#game').on('click', '.plate', function () {
+      $(this).attr('src', './blood.png')
+      $(this).removeClass('plate').addClass('blood')
+      $(this).stop()
+      score -= 10
+      $('#text-score').text(score)
+    })
+  </script>
+</body>
+
+</html>
